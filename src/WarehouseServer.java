@@ -35,7 +35,7 @@ public class WarehouseServer {
         }
     }
 
-    // Методы для работы с пользователями
+    
     public String authenticate(String email, String password) throws SQLException {
         String query = "SELECT access_level_id FROM employees WHERE email = ? AND password = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -98,7 +98,7 @@ public class WarehouseServer {
         return "Пользователь удален успешно.";
     }
 
-    // Методы для работы с категориями
+    
     public List<String> loadCategories() throws SQLException {
         List<String> categories = new ArrayList<>();
         String query = "SELECT category_id, category_name FROM categories";
@@ -145,23 +145,23 @@ public class WarehouseServer {
 
     public List<String> getCategories() throws SQLException {
         List<String> categories = new ArrayList<>();
-        String query = "SELECT category_name FROM categories"; // Измените на правильное название поля
+        String query = "SELECT category_name FROM categories"; 
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                categories.add(rs.getString("category_name")); // Измените на правильное название поля
+                categories.add(rs.getString("category_name")); 
             }
         } catch (SQLException e) {
-            // Обработка ошибок
+            
             throw new SQLException("Ошибка при получении категорий: " + e.getMessage());
         }
 
         return categories;
     }
 
-    // Методы для работы с товарами
+    
     public List<String> loadProducts() throws SQLException {
         List<String> products = new ArrayList<>();
         String query = "SELECT p.product_id, p.name, c.category_name AS category, p.price, p.quantity, p.unit, p.volume, w.warehouse_name " +
@@ -184,7 +184,7 @@ public class WarehouseServer {
     }
 
     public String addProduct(String name, String category, String warehouse, int quantity, String unit, double price, double volume) throws SQLException {
-        // Проверка свободного объема на складе
+        
         String checkQuery = "SELECT (w.volume - COALESCE(SUM(p.volume), 0)) AS free_volume " +
                 "FROM warehouses w " +
                 "LEFT JOIN products p ON w.warehouse_id = p.warehouse_id " +
@@ -200,7 +200,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -246,7 +246,7 @@ public class WarehouseServer {
     }
 
     public String editProduct(int id, String name, String category, String warehouse, int quantity, String unit, double price, double volume) throws SQLException {
-        // Проверка свободного объема на складе
+        
         String checkQuery = "SELECT (w.volume - COALESCE(SUM(p.volume), 0)) AS free_volume " +
                 "FROM warehouses w " +
                 "LEFT JOIN products p ON w.warehouse_id = p.warehouse_id " +
@@ -262,7 +262,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -273,19 +273,19 @@ public class WarehouseServer {
                 "warehouse_id = (SELECT warehouse_id FROM Warehouses WHERE warehouse_name = ?), " +
                 "quantity = ?, unit = ?, price = ?, volume = ? WHERE product_id = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(query)) {
-            stmt.setString(1, name);
-            stmt.setString(2, category);
-            stmt.setString(3, warehouse);
-            stmt.setInt(4, quantity);
-            stmt.setString(5, unit);
-            stmt.setDouble(6, price);
-            stmt.setDouble(7, volume);
-            stmt.setInt(8, id);
+            try (PreparedStatement stmt = connection.prepareStatement(query)) {
+                stmt.setString(1, name);
+                stmt.setString(2, category);
+                stmt.setString(3, warehouse);
+                stmt.setInt(4, quantity);
+                stmt.setString(5, unit);
+                stmt.setDouble(6, price);
+                stmt.setDouble(7, volume);
+                stmt.setInt(8, id);
 
-            int updated = stmt.executeUpdate();
-            return updated > 0 ? "SUCCESS, Товар успешно обновлен" : "ERROR, Товар не найден";
-        }
+                int updated = stmt.executeUpdate();
+                return updated > 0 ? "SUCCESS, Товар успешно обновлен" : "ERROR, Товар не найден";
+            }
     }
 
     public String deleteProduct(int id) {
@@ -384,7 +384,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -427,7 +427,7 @@ public class WarehouseServer {
                 int productId = rs.getInt("product_id");
                 int existingQuantity = rs.getInt("quantity");
 
-                // Update quantity
+                
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
                     updateStmt.setInt(1, quantity);
                     updateStmt.setInt(2, productId);
@@ -436,7 +436,7 @@ public class WarehouseServer {
 
                 return "SUCCESS, Количество товара обновлено на " + quantity;
             } else {
-                // Insert new product
+                
                 try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
                     insertStmt.setString(1, name);
                     insertStmt.setString(2, category);
@@ -458,7 +458,7 @@ public class WarehouseServer {
     }
 
     public String editReturn(int id, int transactionId, String name, int quantity, String unit, double price, double volume, String category, String warehouse) {
-        // Проверка свободного объема на складе
+        
         String checkQuery = "SELECT (w.volume - COALESCE(SUM(p.volume), 0)) AS free_volume " +
                 "FROM warehouses w " +
                 "LEFT JOIN products p ON w.warehouse_id = p.warehouse_id " +
@@ -474,7 +474,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -553,7 +553,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -596,7 +596,7 @@ public class WarehouseServer {
                 int productId = rs.getInt("product_id");
                 int existingQuantity = rs.getInt("quantity");
 
-                // Update quantity
+                
                 try (PreparedStatement updateStmt = connection.prepareStatement(updateQuery)) {
                     updateStmt.setInt(1, quantity);
                     updateStmt.setInt(2, productId);
@@ -605,7 +605,7 @@ public class WarehouseServer {
 
                 return "SUCCESS, Количество товара обновлено на " + quantity;
             } else {
-                // Insert new product
+                
                 try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
                     insertStmt.setString(1, name);
                     insertStmt.setString(2, category);
@@ -627,7 +627,7 @@ public class WarehouseServer {
     }
 
     public String editReception(int id, int transactionId, String name, int quantity, String unit, double price, double volume, String category, String warehouse) {
-        // Проверка свободного объема на складе
+        
         String checkQuery = "SELECT (w.volume - COALESCE(SUM(p.volume), 0)) AS free_volume " +
                 "FROM warehouses w " +
                 "LEFT JOIN products p ON w.warehouse_id = p.warehouse_id " +
@@ -643,7 +643,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -818,7 +818,7 @@ public class WarehouseServer {
                 freeVolume = rs.getDouble("free_volume");
             }
 
-            // Проверяем, достаточно ли свободного объема
+            
             if (freeVolume < volume) {
                 return "ERROR, Недостаточно свободного объема на складе";
             }
@@ -1055,14 +1055,14 @@ public class WarehouseServer {
     public List<String> loadOrderItems() throws SQLException {
         List<String> products = new ArrayList<>();
 
-        // Запрос для получения данных из таблиц
+        
         String query = "SELECT oi.order_item_id, oi.order_id, p.name, w.warehouse_name, " +
                 "oi.quantity AS order_quantity, p.quantity AS available_quantity, " +
                 "o.order_date, o.status " +
                 "FROM orders o " +
                 "JOIN order_items oi ON o.order_id = oi.order_id " +
                 "JOIN products p ON oi.product_id = p.product_id " +
-                "JOIN warehouses w ON p.warehouse_id = w.warehouse_id"; // Добавлено JOIN для получения имени склада
+                "JOIN warehouses w ON p.warehouse_id = w.warehouse_id"; 
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
@@ -1074,7 +1074,7 @@ public class WarehouseServer {
                 products.add(rs.getInt("order_item_id") + "," +
                         rs.getInt("order_id") + "," +
                         rs.getString("name") + " (" + rs.getString("warehouse_name") + ")," +
-                        orderQuantity + (status.isEmpty() ? "" : " (" + status + ")") + "," + // Добавляем статус нехватки
+                        orderQuantity + (status.isEmpty() ? "" : " (" + status + ")") + "," + 
                         rs.getString("order_date") + "," +
                         rs.getString("status"));
             }
@@ -1083,7 +1083,7 @@ public class WarehouseServer {
     }
 
     public String addOrderItem(int orderId, int productId, int quantity) throws SQLException {
-        // Проверяем, достаточно ли товара для выполнения заказа
+        
         String stockQuery = "SELECT quantity FROM products WHERE product_id = ?";
 
         try (PreparedStatement stockStmt = connection.prepareStatement(stockQuery)) {
@@ -1100,7 +1100,7 @@ public class WarehouseServer {
             }
         }
 
-        // Проверяем, существует ли уже запись с таким order_id и product_id
+        
         String checkQuery = "SELECT COUNT(*) FROM order_items WHERE order_id = ? AND product_id = ?";
 
         try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
@@ -1113,7 +1113,7 @@ public class WarehouseServer {
             }
         }
 
-        // Если записи не существует, добавляем новую позицию заказа
+        
         String insertQuery = "INSERT INTO order_items (order_id, product_id, quantity) VALUES (?, ?, ?)";
 
         try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
@@ -1215,7 +1215,7 @@ public class WarehouseServer {
                 suppliers.add(supplierName);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Обработка ошибок
+            e.printStackTrace(); 
         }
 
         return suppliers;
@@ -1225,15 +1225,15 @@ public class WarehouseServer {
         List<String> productList = new ArrayList<>();
         String query = "SELECT p.product_id, p.name, w.warehouse_name " +
                 "FROM products p " +
-                "JOIN Warehouses w ON p.warehouse_id = w.warehouse_id"; // SQL-запрос для выборки продуктов с учетом склада
+                "JOIN Warehouses w ON p.warehouse_id = w.warehouse_id"; 
 
         try (PreparedStatement stmt = connection.prepareStatement(query);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 int id = rs.getInt("product_id");
                 String name = rs.getString("name");
-                String warehouse = rs.getString("warehouse_name"); // Получаем имя склада
-                productList.add(id + "," + name + "," + warehouse); // Добавляем в список в формате "id,name,склад"
+                String warehouse = rs.getString("warehouse_name"); 
+                productList.add(id + "," + name + "," + warehouse); 
             }
         }
         return productList;
@@ -1281,7 +1281,7 @@ public class WarehouseServer {
                 orderIds.add(orderId);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // Обработка ошибок
+            e.printStackTrace(); 
         }
 
         return orderIds;
@@ -1407,7 +1407,7 @@ public class WarehouseServer {
                     String category = resultSet.getString("category_name");
                     String warehouse = resultSet.getString("warehouse_name");
 
-                    // Создание объекта Item и добавление в список
+                    
                     Item item = new Item(name, quantity, unit, price, volume, category, warehouse);
                     items.add(item);
                 }
@@ -1455,12 +1455,12 @@ public class WarehouseServer {
             this.server = server;
 
             try {
-                // Инициализация потоков в конструкторе
+                
                 this.out = new PrintWriter(socket.getOutputStream(), true);
                 this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-                // Установка таймаута для операций чтения
-                socket.setSoTimeout(30000); // 30 секунд
+                
+                socket.setSoTimeout(30000); 
             } catch (IOException e) {
                 System.err.println("Ошибка инициализации клиентского соединения: " + e.getMessage());
                 closeResources();
@@ -1680,7 +1680,7 @@ public class WarehouseServer {
             }
         }
 
-        // Реализация обработчиков команд
+        
         private void handleAddUser(String[] parts) throws SQLException {
             if (parts.length < 5) throw new ArrayIndexOutOfBoundsException();
             out.println(server.addUser(parts[1], parts[2], parts[3], Integer.parseInt(parts[4])));
@@ -1727,36 +1727,36 @@ public class WarehouseServer {
         }
 
 
-        // Реализация обработчиков команд
+        
         private void handleGetCategories() throws SQLException {
-            List<String> categories = server.getCategories(); // Предполагается, что у вас есть метод getCategories на сервере
+            List<String> categories = server.getCategories(); 
             for (String category : categories) {
-                out.println(category); // Отправляем каждую категорию клиенту
+                out.println(category); 
             }
-            out.println("END"); // Помечаем конец списка категорий
+            out.println("END"); 
         }
 
-        // Реализация обработчиков команд
+        
         private void handleGetSuppliers() throws SQLException {
-            List<String> suppliers = server.getSuppliers(); // Предполагается, что у вас есть метод getCategories на сервере
+            List<String> suppliers = server.getSuppliers(); 
             for (String supplier : suppliers) {
-                out.println(supplier); // Отправляем каждую категорию клиенту
+                out.println(supplier); 
             }
-            out.println("END"); // Помечаем конец списка категорий
+            out.println("END"); 
         }
 
         private void handleGetOrderId() throws SQLException {
-            List<Integer> orderId = server.getOrderId(); // Предполагается, что у вас есть метод getCategories на сервере
+            List<Integer> orderId = server.getOrderId(); 
             for (int order : orderId) {
-                out.println(order); // Отправляем каждую категорию клиенту
+                out.println(order); 
             }
-            out.println("END"); // Помечаем конец списка категорий
+            out.println("END"); 
         }
 
         private void handleGetRecTransId() {
             try {
-                // Получаем ID транзакции с сервера
-                Integer transactionId = server.getReceptionTransactionId();  // Теперь возвращает только один ID
+                
+                Integer transactionId = server.getReceptionTransactionId();  
 
                 if (!(transactionId == null || transactionId <= 0)) {
                     out.println(transactionId);
@@ -1769,8 +1769,8 @@ public class WarehouseServer {
 
         private void handleGetShpTransId() {
             try {
-                // Получаем ID транзакции с сервера
-                Integer transactionId = server.getShpTransactionId();  // Теперь возвращает только один ID
+                
+                Integer transactionId = server.getShpTransactionId();  
 
                 if (!(transactionId == null || transactionId <= 0)) {
                     out.println(transactionId);
@@ -1783,8 +1783,8 @@ public class WarehouseServer {
 
         private void handleGetMoveTransId() {
             try {
-                // Получаем ID транзакции с сервера
-                Integer transactionId = server.getMoveTransactionId();  // Теперь возвращает только один ID
+                
+                Integer transactionId = server.getMoveTransactionId();  
 
                 if (!(transactionId == null || transactionId <= 0)) {
                     out.println(transactionId);
@@ -1797,8 +1797,8 @@ public class WarehouseServer {
 
         private void handleGetRetTransId() {
             try {
-                // Получаем ID транзакции с сервера
-                Integer transactionId = server.getReturnTransactionId();  // Теперь возвращает только один ID
+                
+                Integer transactionId = server.getReturnTransactionId();  
 
                 if (!(transactionId == null || transactionId <= 0)) {
                     out.println(transactionId);
@@ -1810,18 +1810,18 @@ public class WarehouseServer {
         }
 
         private void handleGetProducts() throws SQLException {
-            List<String> products = server.getProducts(); // Предполагается, что метод возвращает список строк в формате "id,name"
+            List<String> products = server.getProducts(); 
 
             for (String product : products) {
-                out.println(product); // Отправляем каждую строку клиенту
+                out.println(product); 
             }
-            out.println("END"); // Помечаем конец списка
+            out.println("END"); 
         }
 
         private void handleGetProductUnit(int productId) throws SQLException {
-            String unit = server.getProductUnit(productId); // Получаем единицу измерения для конкретного продукта
+            String unit = server.getProductUnit(productId); 
             if (unit != null) {
-                out.println(unit); // Отправляем единицу измерения клиенту
+                out.println(unit); 
             } else {
                 out.println("ERROR, Продукт не найден");
             }
@@ -1829,7 +1829,7 @@ public class WarehouseServer {
         private void handleGetTransItem(String[] parts) throws SQLException {
             int transactionId = Integer.parseInt(parts[1]);
             String transactionType = parts[2];
-            List<Item> items = server.getItemsByTransactionId(transactionId, transactionType); // Получаем товары по ID транзакции
+            List<Item> items = server.getItemsByTransactionId(transactionId, transactionType); 
             if (items != null && !items.isEmpty()) {
                 for (Item item : items) {
                     out.println(item.getName() + "," +
@@ -1840,22 +1840,22 @@ public class WarehouseServer {
                             item.getCategory() + "," +
                             item.getWarehouse());
                 }
-                out.println("END"); // Уведомление о конце передачи данных
+                out.println("END"); 
             } else {
                 out.println("ERROR, Товары не найдены для данной транзакции");
             }
         }
 
         private void handleGetWarehouses() throws SQLException {
-            List<String> warehouses = server.getWarehouses(); // Предполагается, что метод возвращает список строк в формате "id,name"
+            List<String> warehouses = server.getWarehouses(); 
 
             for (String warehouse : warehouses) {
-                out.println(warehouse); // Отправляем каждую строку клиенту
+                out.println(warehouse); 
             }
-            out.println("END"); // Помечаем конец списка
+            out.println("END"); 
         }
 
-        // Аналогичные методы для категорий и продуктов
+        
         private void handleAddCategory(String[] parts) throws SQLException {
             if (parts.length < 2) throw new ArrayIndexOutOfBoundsException();
             out.println(server.addCategory(parts[1]));
@@ -1919,7 +1919,7 @@ public class WarehouseServer {
         private void handleAddProduct(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 6) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - название, parts[2] - категория, parts[3] - склад, parts[4] - количество, parts[5] - цена, parts[6] - объем
+            
             double price = Double.parseDouble(parts[5]);
             int quantity = Integer.parseInt(parts[4]);
             double volume = Double.parseDouble(parts[6]);
@@ -1930,7 +1930,7 @@ public class WarehouseServer {
         private void handleEditProduct(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 7) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - ID, parts[2] - название, parts[3] - категория, parts[4] - склад, parts[5] - количество, parts[6] - цена, parts[7] - объем
+            
             int id = Integer.parseInt(parts[1]);
             double price = Double.parseDouble(parts[5]);
             int quantity = Integer.parseInt(parts[6]);
@@ -1948,24 +1948,24 @@ public class WarehouseServer {
         private void handleAddReturn(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - название, parts[2] - категория, parts[3] - склад, parts[4] - количество, parts[5] - цена, parts[6] - объем
+            
             String name = parts[2];
             int transactionId=Integer.parseInt(parts[1]);
-            String category = parts[7];  // Предполагаем, что передается ID категории
-            String warehouse = parts[8];  // Предполагаем, что передается ID склада
+            String category = parts[7];  
+            String warehouse = parts[8];  
             int quantity = Integer.parseInt(parts[3]);
             double price = Double.parseDouble(parts[4]);
             double volume = Double.parseDouble(parts[5]);
-            String unit = parts.length > 6 ? parts[6] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 6 ? parts[6] : "шт"; 
 
-            // Добавление товара в транзакцию
+            
             out.println(server.addReturn(transactionId, name, quantity, unit, price, volume, category, warehouse));
         }
 
         private void handleEditReturn(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - ID, parts[2] - название, parts[3] - категория, parts[4] - склад, parts[5] - количество, parts[6] - цена, parts[7] - объем
+            
             int id = Integer.parseInt(parts[1]);
             int idTran = Integer.parseInt(parts[2]);
             String name = parts[3];
@@ -1974,7 +1974,7 @@ public class WarehouseServer {
             int quantity = Integer.parseInt(parts[7]);
             double price = Double.parseDouble(parts[6]);
             double volume = Double.parseDouble(parts[8]);
-            String unit = parts.length > 9 ? parts[9] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 9 ? parts[9] : "шт"; 
 
             out.println(server.editReturn(id, idTran, name, quantity, unit, price, volume, category, warehouse));
         }
@@ -1988,24 +1988,24 @@ public class WarehouseServer {
         private void handleAddReception(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - название, parts[2] - категория, parts[3] - склад, parts[4] - количество, parts[5] - цена, parts[6] - объем
+            
             String name = parts[2];
             int transactionId=Integer.parseInt(parts[1]);
-            String category = parts[7];  // Предполагаем, что передается ID категории
-            String warehouse = parts[8];  // Предполагаем, что передается ID склада
+            String category = parts[7];  
+            String warehouse = parts[8];  
             int quantity = Integer.parseInt(parts[3]);
             double price = Double.parseDouble(parts[4]);
             double volume = Double.parseDouble(parts[5]);
-            String unit = parts.length > 6 ? parts[6] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 6 ? parts[6] : "шт"; 
 
-            // Добавление товара в транзакцию
+            
             out.println(server.addReception(transactionId, name, quantity, unit, price, volume, category, warehouse));
         }
 
         private void handleEditReception(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - ID, parts[2] - название, parts[3] - категория, parts[4] - склад, parts[5] - количество, parts[6] - цена, parts[7] - объем
+            
             int id = Integer.parseInt(parts[1]);
             int idTran = Integer.parseInt(parts[2]);
             String name = parts[3];
@@ -2014,7 +2014,7 @@ public class WarehouseServer {
             int quantity = Integer.parseInt(parts[7]);
             double price = Double.parseDouble(parts[6]);
             double volume = Double.parseDouble(parts[8]);
-            String unit = parts.length > 9 ? parts[9] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 9 ? parts[9] : "шт"; 
 
             out.println(server.editReception(id, idTran, name, quantity, unit, price, volume, category, warehouse));
         }
@@ -2028,24 +2028,24 @@ public class WarehouseServer {
         private void handleAddShipment(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - название, parts[2] - категория, parts[3] - склад, parts[4] - количество, parts[5] - цена, parts[6] - объем
+            
             String name = parts[2];
             int transactionId=Integer.parseInt(parts[1]);
-            String category = parts[7];  // Предполагаем, что передается ID категории
-            String warehouse = parts[8];  // Предполагаем, что передается ID склада
+            String category = parts[7];  
+            String warehouse = parts[8];  
             int quantity = Integer.parseInt(parts[3]);
             double price = Double.parseDouble(parts[4]);
             double volume = Double.parseDouble(parts[5]);
-            String unit = parts.length > 6 ? parts[6] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 6 ? parts[6] : "шт"; 
 
-            // Добавление товара в транзакцию
+            
             out.println(server.addShipment(transactionId, name, quantity, unit, price, volume, category, warehouse));
         }
 
         private void handleEditShipment(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 8) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - ID, parts[2] - название, parts[3] - категория, parts[4] - склад, parts[5] - количество, parts[6] - цена, parts[7] - объем
+            
             int id = Integer.parseInt(parts[1]);
             int idTran = Integer.parseInt(parts[2]);
             String name = parts[3];
@@ -2054,7 +2054,7 @@ public class WarehouseServer {
             int quantity = Integer.parseInt(parts[7]);
             double price = Double.parseDouble(parts[6]);
             double volume = Double.parseDouble(parts[8]);
-            String unit = parts.length > 9 ? parts[9] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 9 ? parts[9] : "шт"; 
 
             out.println(server.editShipment(id, idTran, name, quantity, unit, price, volume, category, warehouse));
         }
@@ -2068,25 +2068,25 @@ public class WarehouseServer {
         private void handleAddMove(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 9) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - название, parts[2] - категория, parts[3] - склад, parts[4] - количество, parts[5] - цена, parts[6] - объем
+            
             String name = parts[2];
             int transactionId=Integer.parseInt(parts[1]);
-            String category = parts[7];  // Предполагаем, что передается ID категории
+            String category = parts[7];  
             String warehouse_past = parts[8];
-            String warehouse = parts[9];  // Предполагаем, что передается ID склада
+            String warehouse = parts[9];  
             int quantity = Integer.parseInt(parts[3]);
             double price = Double.parseDouble(parts[4]);
             double volume = Double.parseDouble(parts[5]);
-            String unit = parts.length > 6 ? parts[6] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 6 ? parts[6] : "шт"; 
 
-            // Добавление товара в транзакцию
+            
             out.println(server.addMove(transactionId, name, quantity, unit, price, volume, category, warehouse, warehouse_past));
         }
 
         private void handleEditMove(String[] parts) throws SQLException, NumberFormatException {
             if (parts.length < 9) throw new ArrayIndexOutOfBoundsException();
 
-            // parts[1] - ID, parts[2] - название, parts[3] - категория, parts[4] - склад, parts[5] - количество, parts[6] - цена, parts[7] - объем
+            
             int id = Integer.parseInt(parts[1]);
             int idTran = Integer.parseInt(parts[2]);
             String name = parts[3];
@@ -2096,7 +2096,7 @@ public class WarehouseServer {
             int quantity = Integer.parseInt(parts[7]);
             double price = Double.parseDouble(parts[6]);
             double volume = Double.parseDouble(parts[8]);
-            String unit = parts.length > 9 ? parts[9] : "шт"; // Если есть, используем указанный юнит, иначе по умолчанию "шт"
+            String unit = parts.length > 9 ? parts[9] : "шт"; 
 
             out.println(server.editMove(id, idTran, name, quantity, unit, price, volume, category, warehouse, warehouse_past));
         }
@@ -2135,7 +2135,7 @@ public class WarehouseServer {
     public static void main(String[] args) {
         try {
             WarehouseServer server = new WarehouseServer(
-                    "jdbc:mysql://localhost:3306/warehouse",
+                    "jdbc:mysql:
                     "pma",
                     "your_password"
             );
