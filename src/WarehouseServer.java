@@ -2135,7 +2135,7 @@ public class WarehouseServer {
     public static void main(String[] args) {
         try {
             WarehouseServer server = new WarehouseServer(
-                    "jdbc:mysql:
+                   "jdbc:mysql://localhost:3306/warehouse",
                     "pma",
                     "your_password"
             );
